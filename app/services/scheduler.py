@@ -136,6 +136,7 @@ def check_replies_job() -> None:
     from app.database import SessionLocal
     from app.services.gmail import check_for_replies
 
+    logger.info("Running reply check job...")
     db = SessionLocal()
     try:
         sent_emails = (
@@ -148,6 +149,7 @@ def check_replies_job() -> None:
             .all()
         )
 
+        logger.info(f"Found {len(sent_emails)} emails to check for replies")
         if not sent_emails:
             return
 

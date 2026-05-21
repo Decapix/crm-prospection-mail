@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Request, Depends
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Campaign
 from app.templating import templates
+from app.services.scheduler import check_replies_job
 
 router = APIRouter()
 
@@ -32,3 +34,10 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(request, "dashboard.html", {
         "campaign_stats": campaign_stats,
     })
+
+
+@router.post("/check-replies")
+def trigger_check_replies():
+    """Manually trigger a reply check."""
+    check_replies_job()
+    return RedirectResponse(url="/", status_code=303)

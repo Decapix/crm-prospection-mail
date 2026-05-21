@@ -1,4 +1,5 @@
 import base64
+import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -7,6 +8,8 @@ from googleapiclient.discovery import build
 from app.services.google_sheets import get_google_credentials
 from app.services.tracking import build_tracking_url
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 def _get_gmail_service():
@@ -68,8 +71,11 @@ def check_for_replies(gmail_message_ids: list[str]) -> dict[str, bool]:
             ).execute()
 
             message_count = len(thread.get("messages", []))
-            results[msg_id] = message_count > 1
-        except Exception:
+            has_reply = message_count > 1
+            results[msg_id] = has_reply
+            logger.info(f"Reply check for {msg_id}: thread={thread_id}, messages={message_count}, has_reply={has_reply}")
+        except Exception as e:
+            logger.error(f"Reply check failed for {msg_id}: {e}")
             results[msg_id] = False
 
     return results

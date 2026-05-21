@@ -4,7 +4,12 @@
 {% block content %}
 <div class="flex justify-between items-center mb-2">
     <h1>Campagnes</h1>
-    <a href="/campaigns/new/step1" class="btn btn-primary">Nouvelle Campagne</a>
+    <div class="flex gap-1">
+        <form method="post" action="/check-replies" style="display: inline;">
+            <button type="submit" class="btn">Vérifier les réponses</button>
+        </form>
+        <a href="/campaigns/new/step1" class="btn btn-primary">Nouvelle Campagne</a>
+    </div>
 </div>
 
 {% if campaign_stats %}
