@@ -5,7 +5,7 @@ services:
       - "8000:8000"
     volumes:
       - crm_data:/app/data
-      - ./credentials:/app/credentials:ro
+      - ./credentials:/app/credentials
     env_file:
       - .env
     restart: unless-stopped
