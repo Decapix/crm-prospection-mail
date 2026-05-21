@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Réponses — CRM{% endblock %}
+
+{% block content %}
+<h1>Réponses</h1>
+
+{% if replied_emails %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Entreprise</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Campagne</th>
+                <th>Date réponse</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in replied_emails %}
+            <tr class="clickable" onclick="window.location='/replies/{{ email.id }}'">
+                <td>{{ email.recipient_data.get('nom_du_fondateur_decisionnaire', email.recipient_data.get('prenom', '')) }}</td>
+                <td>{{ email.recipient_data.get('nom', '') }}</td>
+                <td>{{ email.recipient_email }}</td>
+                <td>{{ email.recipient_data.get('telephone', '—') }}</td>
+                <td>{{ email.campaign.name }}</td>
+                <td>{{ email.reply_detected_at.strftime('%d/%m/%Y %H:%M') if email.reply_detected_at else '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>Aucune réponse reçue pour le moment.</p>
+</div>
+{% endif %}
+{% endblock %}

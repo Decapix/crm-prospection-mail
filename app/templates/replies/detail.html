@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ email.recipient_data.get('nom', '') }} — Détail{% endblock %}
+
+{% block content %}
+<h1>{{ email.recipient_data.get('nom_du_fondateur_decisionnaire', '') }}</h1>
+
+<div class="card">
+    <h2>Informations</h2>
+    <table>
+        <tr><th>Entreprise</th><td>{{ email.recipient_data.get('nom', '—') }}</td></tr>
+        <tr><th>Nom complet</th><td>{{ email.recipient_data.get('nom_du_fondateur_decisionnaire', '—') }}</td></tr>
+        <tr><th>Prénom</th><td>{{ email.recipient_data.get('prenom', '—') }}</td></tr>
+        <tr><th>Email</th><td>{{ email.recipient_email }}</td></tr>
+        <tr><th>Téléphone</th><td>{{ email.recipient_data.get('telephone', '—') }}</td></tr>
+        <tr><th>Adresse</th><td>{{ email.recipient_data.get('adresse', '—') }}</td></tr>
+        <tr><th>Site web</th><td>
+            {% if email.recipient_data.get('site_web') %}
+            <a href="{{ email.recipient_data.get('site_web') }}" target="_blank">{{ email.recipient_data.get('site_web') }}</a>
+            {% else %}—{% endif %}
+        </td></tr>
+        <tr><th>LinkedIn</th><td>
+            {% if email.recipient_data.get('linkedlin_du_fondateur_decisionnaire') %}
+            <a href="{{ email.recipient_data.get('linkedlin_du_fondateur_decisionnaire') }}" target="_blank">Profil LinkedIn</a>
+            {% else %}—{% endif %}
+        </td></tr>
+        <tr><th>Note Google</th><td>{{ email.recipient_data.get('note', '—') }}</td></tr>
+        <tr><th>Horaires</th><td>{{ email.recipient_data.get('horaires', '—') }}</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>Campagne</h2>
+    <table>
+        <tr><th>Campagne</th><td><a href="/campaigns/{{ email.campaign.id }}">{{ email.campaign.name }}</a></td></tr>
+        <tr><th>Template</th><td>{{ email.campaign.template.name }}</td></tr>
+        <tr><th>Envoyé le</th><td>{{ email.sent_at.strftime('%d/%m/%Y %H:%M') if email.sent_at else '—' }}</td></tr>
+        <tr><th>Ouvert le</th><td>{{ email.opened_at.strftime('%d/%m/%Y %H:%M') if email.opened_at else '—' }}</td></tr>
+        <tr><th>Réponse le</th><td>{{ email.reply_detected_at.strftime('%d/%m/%Y %H:%M') if email.reply_detected_at else '—' }}</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <div class="flex justify-between items-center mb-2">
+        <h2>Suivi</h2>
+    </div>
+
+    <form method="post" action="/replies/{{ email.id }}/follow-up" class="mb-2">
+        <div class="form-group">
+            <textarea name="note" rows="2" required placeholder="Ex: Appelé, pas de réponse. Rappeler demain."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter une note</button>
+    </form>
+
+    {% if follow_ups %}
+        {% for fu in follow_ups %}
+        <div class="follow-up-item">
+            <div class="follow-up-date">{{ fu.created_at.strftime('%d/%m/%Y %H:%M') if fu.created_at else '' }}</div>
+            <div>{{ fu.note }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: var(--text-light)">Aucune note de suivi.</p>
+    {% endif %}
+</div>
+
+<a href="/replies" class="btn">← Retour aux réponses</a>
+{% endblock %}
