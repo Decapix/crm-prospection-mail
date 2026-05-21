@@ -6,3 +6,4 @@ data/
 *.db
 venv/
 .pytest_cache/
+docs/start.md

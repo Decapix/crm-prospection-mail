@@ -163,40 +163,6 @@ rsync -avz --delete \
 ssh user@YOUR_VM_IP "cd ~/crm && docker compose up -d --build"
 ```
 
-### One-liner deploy script
-
-Create a `deploy.sh` at the project root:
-
-```bash
-#!/bin/bash
-VM_USER=your-user
-VM_IP=your-vm-ip
-VM_PATH=~/crm
-
-echo "==> Syncing files..."
-rsync -avz --delete \
-  --exclude '.env' \
-  --exclude 'credentials/' \
-  --exclude 'data/' \
-  --exclude '*.db' \
-  --exclude '__pycache__/' \
-  --exclude '.pytest_cache/' \
-  --exclude 'venv/' \
-  --exclude '.git/' \
-  ./ ${VM_USER}@${VM_IP}:${VM_PATH}/
-
-echo "==> Rebuilding and restarting..."
-ssh ${VM_USER}@${VM_IP} "cd ${VM_PATH} && docker compose up -d --build"
-
-echo "==> Done!"
-```
-
-Make it executable and run:
-
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
 
 **Important:** `.env`, `credentials/`, and `data/` are excluded so you never overwrite the VM's config or database. These files only exist on the VM.
 
