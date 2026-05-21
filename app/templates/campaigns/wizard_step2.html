@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle Campagne — Étape 2{% endblock %}
+
+{% block content %}
+<div class="steps">
+    <span class="step done">1. Nom & Template</span>
+    <span class="step active">2. Destinataires</span>
+    <span class="step">3. Aperçu</span>
+    <span class="step">4. Planning</span>
+    <span class="step">5. Confirmation</span>
+</div>
+
+<h1>Sélection des destinataires</h1>
+<div class="card">
+    <p>{{ prospects|length }} adresses email disponibles (déjà contactés exclus)</p>
+
+    <form method="post" action="/campaigns/new/step2">
+        <div class="form-group">
+            <label>Sélection automatique (nombre)</label>
+            <input type="number" name="auto_select_count" min="0" max="{{ prospects|length }}" value="0"
+                   placeholder="Ex: 10 pour sélectionner les 10 premiers">
+            <small style="color: var(--text-light)">Mettez 0 pour sélectionner manuellement ci-dessous</small>
+        </div>
+
+        <div class="form-group">
+            <label>Ou sélection manuelle :</label>
+            <div class="checkbox-list">
+                {% for p in prospects %}
+                <label>
+                    <input type="checkbox" name="selected_emails" value="{{ p.email_du_decisionnaire }}">
+                    <strong>{{ p.get('nom', '') }}</strong> — {{ p.get('prenom', '') }}
+                    ({{ p.email_du_decisionnaire }})
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Suivant →</button>
+        <a href="/campaigns/new/step1" class="btn">← Retour</a>
+    </form>
+</div>
+{% endblock %}

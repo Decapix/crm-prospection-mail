@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle Campagne — Étape 1{% endblock %}
+
+{% block content %}
+<div class="steps">
+    <span class="step active">1. Nom & Template</span>
+    <span class="step">2. Destinataires</span>
+    <span class="step">3. Aperçu</span>
+    <span class="step">4. Planning</span>
+    <span class="step">5. Confirmation</span>
+</div>
+
+<h1>Nouvelle Campagne</h1>
+<div class="card">
+    <form method="post" action="/campaigns/new/step1">
+        <div class="form-group">
+            <label>Nom de la campagne</label>
+            <input type="text" name="campaign_name" required placeholder="Ex: Syndics Vague 2">
+        </div>
+        <div class="form-group">
+            <label>Template</label>
+            <select name="template_id" required>
+                <option value="">— Choisir un template —</option>
+                {% for t in all_templates %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% if not all_templates %}
+        <p style="color: var(--danger)">Aucun template disponible. <a href="/templates/create">Créez-en un d'abord.</a></p>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Suivant →</button>
+    </form>
+</div>
+{% endblock %}

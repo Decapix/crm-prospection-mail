@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }} — CRM{% endblock %}
+
+{% block content %}
+<h1>{{ campaign.name }}</h1>
+
+<div class="card">
+    <div class="flex justify-between items-center">
+        <div>
+            <span class="badge badge-{{ campaign.status }}">{{ campaign.status }}</span>
+            <span style="margin-left: 1rem; color: var(--text-light)">
+                Template : {{ campaign.template.name }}
+            </span>
+        </div>
+        <div style="color: var(--text-light)">
+            {% if campaign.send_start %}
+            {{ campaign.send_start.strftime('%d/%m/%Y %H:%M') }} → {{ campaign.send_end.strftime('%d/%m/%Y %H:%M') }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="stat card">
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat card">
+        <div class="stat-value">{{ sent }}</div>
+        <div class="stat-label">Envoyés</div>
+    </div>
+    <div class="stat card">
+        <div class="stat-value">{{ opened }}</div>
+        <div class="stat-label">Ouverts</div>
+    </div>
+    <div class="stat card">
+        <div class="stat-value">{{ replied }}</div>
+        <div class="stat-label">Réponses</div>
+    </div>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Destinataire</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Planifié</th>
+                <th>Envoyé</th>
+                <th>Ouvert</th>
+                <th>Réponse</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails %}
+            <tr {% if email.send_status == 'failed' %}style="background: #fee2e2"{% endif %}>
+                <td>{{ email.recipient_data.get('prenom', '') }} {{ email.recipient_data.get('nom', '') }}</td>
+                <td>{{ email.recipient_email }}</td>
+                <td><span class="badge badge-{{ email.send_status }}">{{ email.send_status }}</span></td>
+                <td>{{ email.scheduled_at.strftime('%d/%m %H:%M') if email.scheduled_at else '—' }}</td>
+                <td>{{ email.sent_at.strftime('%d/%m %H:%M') if email.sent_at else '—' }}</td>
+                <td>{{ email.opened_at.strftime('%d/%m %H:%M') if email.opened_at else '—' }}</td>
+                <td>{{ email.reply_detected_at.strftime('%d/%m %H:%M') if email.reply_detected_at else '—' }}</td>
+            </tr>
+            {% if email.send_status == 'failed' %}
+            <tr style="background: #fee2e2">
+                <td colspan="7" style="color: var(--danger); font-size: 0.875rem">
+                    Erreur : {{ email.failure_reason }}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="/" class="btn">← Retour aux campagnes</a>
+{% endblock %}

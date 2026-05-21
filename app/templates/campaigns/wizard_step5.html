@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle Campagne — Étape 5{% endblock %}
+
+{% block content %}
+<div class="steps">
+    <span class="step done">1. Nom & Template</span>
+    <span class="step done">2. Destinataires</span>
+    <span class="step done">3. Aperçu</span>
+    <span class="step done">4. Planning</span>
+    <span class="step active">5. Confirmation</span>
+</div>
+
+<h1>Confirmation</h1>
+<div class="card">
+    <h2>Résumé</h2>
+    <table>
+        <tr><th>Campagne</th><td>{{ wizard.campaign_name }}</td></tr>
+        <tr><th>Template</th><td>{{ template.name }}</td></tr>
+        <tr><th>Destinataires</th><td>{{ wizard.recipients|length }} emails</td></tr>
+        <tr><th>Début</th><td>{{ wizard.send_start }}</td></tr>
+        <tr><th>Fin</th><td>{{ wizard.send_end }}</td></tr>
+    </table>
+
+    <form method="post" action="/campaigns/new/confirm" class="mt-2">
+        <button type="submit" class="btn btn-primary">Lancer la Campagne</button>
+        <a href="/campaigns/new/step4" class="btn">← Retour</a>
+    </form>
+</div>
+{% endblock %}

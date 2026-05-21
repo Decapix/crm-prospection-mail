@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle Campagne — Étape 3{% endblock %}
+
+{% block content %}
+<div class="steps">
+    <span class="step done">1. Nom & Template</span>
+    <span class="step done">2. Destinataires</span>
+    <span class="step active">3. Aperçu</span>
+    <span class="step">4. Planning</span>
+    <span class="step">5. Confirmation</span>
+</div>
+
+<h1>Aperçu des emails ({{ previews|length }})</h1>
+<form method="post" action="/campaigns/new/step3">
+    {% for preview in previews %}
+    <div class="preview-card">
+        <div class="preview-to">À : {{ preview.email }} ({{ preview.prenom }} — {{ preview.nom }})</div>
+        <div class="preview-subject">Objet : {{ preview.subject }}</div>
+        <div>{{ preview.body | safe }}</div>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Suivant →</button>
+    <a href="/campaigns/new/step2" class="btn">← Retour</a>
+</form>
+{% endblock %}
