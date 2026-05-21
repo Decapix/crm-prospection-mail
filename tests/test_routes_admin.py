@@ -22,7 +22,8 @@ def test_import_campaign():
         "status": "completed",
         "emails": "test1@example.com\ntest2@example.com",
         "send_status": "sent",
-        "sent_date": "2026-05-01T10:00",
+        "sent_date": "2026-05-01",
+        "sent_time": "10:00",
     }, follow_redirects=False)
     assert response.status_code == 303
 

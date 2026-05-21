@@ -29,9 +29,12 @@ def import_campaign(
     emails: str = Form(...),
     send_status: str = Form("sent"),
     sent_date: str = Form(""),
+    sent_time: str = Form("10:00"),
     db: Session = Depends(get_db),
 ):
-    sent_at = datetime.fromisoformat(sent_date) if sent_date else None
+    sent_at = None
+    if sent_date:
+        sent_at = datetime.fromisoformat(f"{sent_date}T{sent_time}")
 
     campaign = Campaign(
         name=campaign_name,
