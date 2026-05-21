@@ -18,6 +18,20 @@
             </select>
         </div>
         <div class="form-group">
+            <label>Début de l'envoi</label>
+            <div>
+                <input type="date" name="send_start_date" value="{{ campaign.send_start.strftime('%Y-%m-%d') if campaign.send_start else '' }}" style="width: auto; display: inline-block;">
+                <input type="time" name="send_start_time" value="{{ campaign.send_start.strftime('%H:%M') if campaign.send_start else '09:00' }}" style="width: auto; display: inline-block;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Fin de l'envoi</label>
+            <div>
+                <input type="date" name="send_end_date" value="{{ campaign.send_end.strftime('%Y-%m-%d') if campaign.send_end else '' }}" style="width: auto; display: inline-block;">
+                <input type="time" name="send_end_time" value="{{ campaign.send_end.strftime('%H:%M') if campaign.send_end else '18:00' }}" style="width: auto; display: inline-block;">
+            </div>
+        </div>
+        <div class="form-group">
             <label>Statut</label>
             <select name="status" required>
                 {% for s in ['draft', 'scheduled', 'in_progress', 'completed'] %}

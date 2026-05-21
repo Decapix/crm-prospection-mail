@@ -240,12 +240,46 @@ def campaign_edit_post(
     name: str = Form(...),
     template_id: int = Form(...),
     status: str = Form(...),
+    send_start_date: str = Form(""),
+    send_start_time: str = Form("09:00"),
+    send_end_date: str = Form(""),
+    send_end_time: str = Form("18:00"),
     db: Session = Depends(get_db),
 ):
     campaign = db.get(Campaign, campaign_id)
     campaign.name = name
     campaign.template_id = template_id
     campaign.status = status
+
+    # Update schedule if dates provided
+    new_start = None
+    new_end = None
+    if send_start_date:
+        new_start = datetime.fromisoformat(f"{send_start_date}T{send_start_time}")
+        campaign.send_start = new_start
+    if send_end_date:
+        new_end = datetime.fromisoformat(f"{send_end_date}T{send_end_time}")
+        campaign.send_end = new_end
+
+    # Reschedule pending emails if the time window changed
+    if new_start and new_end:
+        pending_emails = (
+            db.query(CampaignEmail)
+            .filter(
+                CampaignEmail.campaign_id == campaign_id,
+                CampaignEmail.send_status == "pending",
+            )
+            .all()
+        )
+        if pending_emails:
+            new_times = generate_send_times(len(pending_emails), new_start, new_end)
+            for email, new_time in zip(pending_emails, new_times):
+                email.scheduled_at = new_time
+
+            # Reschedule in APScheduler
+            if status in ("scheduled", "in_progress"):
+                schedule_campaign(db, campaign_id)
+
     db.commit()
     return RedirectResponse(url=f"/campaigns/{campaign_id}", status_code=303)
 
