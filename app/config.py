@@ -15,6 +15,9 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./data/crm.db"
 
+    auth_username: str = "admin"
+    auth_password: str = "admin"
+
     class Config:
         env_file = ".env"
 

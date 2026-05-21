@@ -48,4 +48,11 @@ def reset_db():
     Base.metadata.drop_all(bind=engine_test)
 
 
-client = TestClient(app)
+from app.config import settings
+
+client = TestClient(app, headers={
+    "Authorization": "Basic "
+    + __import__("base64").b64encode(
+        f"{settings.auth_username}:{settings.auth_password}".encode()
+    ).decode()
+})
