@@ -131,12 +131,53 @@ def reload_pending_jobs(db: Session) -> None:
             break
 
 
+def check_replies_job() -> None:
+    """Periodic job to check Gmail for replies to sent campaign emails."""
+    from app.database import SessionLocal
+    from app.services.gmail import check_for_replies
+
+    db = SessionLocal()
+    try:
+        sent_emails = (
+            db.query(CampaignEmail)
+            .filter(
+                CampaignEmail.send_status == "sent",
+                CampaignEmail.gmail_message_id.isnot(None),
+                CampaignEmail.reply_detected_at.is_(None),
+            )
+            .all()
+        )
+
+        if not sent_emails:
+            return
+
+        msg_id_to_email = {e.gmail_message_id: e for e in sent_emails}
+        results = check_for_replies(list(msg_id_to_email.keys()))
+
+        for msg_id, has_reply in results.items():
+            if has_reply:
+                email = msg_id_to_email[msg_id]
+                email.reply_detected_at = datetime.utcnow()
+                logger.info(f"Reply detected from {email.recipient_email}")
+
+        db.commit()
+    finally:
+        db.close()
+
+
 def init_scheduler() -> BackgroundScheduler:
     """Initialize and start the APScheduler."""
     global scheduler
     job_store = SQLAlchemyJobStore(url=settings.database_url)
     scheduler = BackgroundScheduler(jobstores={"default": job_store})
     scheduler.start()
+    scheduler.add_job(
+        check_replies_job,
+        "interval",
+        minutes=5,
+        id="check_replies",
+        replace_existing=True,
+    )
     return scheduler
 
 
