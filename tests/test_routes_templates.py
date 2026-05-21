@@ -1,39 +1,5 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-from app.database import Base, get_db
+from tests.conftest import TestSession, client
 from app.models import Template
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-engine_test = create_engine(
-    "sqlite://",
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestSession = sessionmaker(bind=engine_test)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-client = TestClient(app)
-
-
-def setup_function():
-    Base.metadata.create_all(bind=engine_test)
-
-
-def teardown_function():
-    Base.metadata.drop_all(bind=engine_test)
 
 
 def test_templates_list_empty():
