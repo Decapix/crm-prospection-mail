@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Import Manuel — CRM{% endblock %}
+
+{% block content %}
+<h1>Import Manuel</h1>
+<div class="card">
+    <p style="color: var(--text-light); margin-bottom: 1rem;">
+        Utilisez ce formulaire pour importer des campagnes déjà envoyées manuellement.
+    </p>
+    <form method="post" action="/admin/import">
+        <div class="form-group">
+            <label>Nom de la campagne</label>
+            <input type="text" name="campaign_name" required placeholder="Ex: Campagne manuelle mai 2026">
+        </div>
+        <div class="form-group">
+            <label>Template utilisé</label>
+            <select name="template_id" required>
+                <option value="">— Choisir —</option>
+                {% for t in all_templates %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+                {% endfor %}
+            </select>
+            <small style="color: var(--text-light)">Créez d'abord le template si nécessaire</small>
+        </div>
+        <div class="form-group">
+            <label>Statut de la campagne</label>
+            <select name="status">
+                <option value="completed">Terminée</option>
+                <option value="in_progress">En cours</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Adresses email (une par ligne)</label>
+            <textarea name="emails" required placeholder="email1@example.com
+email2@example.com
+email3@example.com"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Statut des emails</label>
+            <select name="send_status">
+                <option value="sent">Envoyé</option>
+                <option value="failed">Échoué</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Date d'envoi</label>
+            <input type="datetime-local" name="sent_date">
+        </div>
+        <button type="submit" class="btn btn-primary">Importer</button>
+    </form>
+</div>
+{% endblock %}
