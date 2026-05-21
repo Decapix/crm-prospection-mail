@@ -9,6 +9,15 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    restart: unless-stopped
 volumes:
   crm_data:
+  caddy_data:

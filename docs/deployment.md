@@ -157,10 +157,10 @@ rsync -avz --delete \
   --exclude '.pytest_cache/' \
   --exclude 'venv/' \
   --exclude '.git/' \
-  ./ user@YOUR_VM_IP:~/crm/
+  ./ hetzner:~/crm/
 
 # Then rebuild and restart remotely
-ssh user@YOUR_VM_IP "cd ~/crm && docker compose up -d --build"
+ssh hetzner "cd ~/crm && docker compose up -d --build"
 ```
 
 
