@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Modifier Campagne — CRM{% endblock %}
+
+{% block content %}
+<h1>Modifier : {{ campaign.name }}</h1>
+<div class="card">
+    <form method="post" action="/campaigns/{{ campaign.id }}/edit">
+        <div class="form-group">
+            <label>Nom de la campagne</label>
+            <input type="text" name="name" value="{{ campaign.name }}" required>
+        </div>
+        <div class="form-group">
+            <label>Template</label>
+            <select name="template_id" required>
+                {% for t in all_templates %}
+                <option value="{{ t.id }}" {% if t.id == campaign.template_id %}selected{% endif %}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Statut</label>
+            <select name="status" required>
+                {% for s in ['draft', 'scheduled', 'in_progress', 'completed'] %}
+                <option value="{{ s }}" {% if s == campaign.status %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="/campaigns/{{ campaign.id }}" class="btn">Annuler</a>
+    </form>
+</div>
+{% endblock %}

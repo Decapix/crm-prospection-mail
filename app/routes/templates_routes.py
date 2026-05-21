@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Template
+from app.models import Template, Campaign
 from app.templating import templates
 
 router = APIRouter(prefix="/templates")
@@ -84,4 +84,23 @@ def edit_template(
     template.subject_template = subject_template
     template.body_template = body_template
     db.commit()
+    return RedirectResponse(url="/templates", status_code=303)
+
+
+@router.post("/{template_id}/delete")
+def delete_template(template_id: int, db: Session = Depends(get_db)):
+    template = db.query(Template).get(template_id)
+    if template:
+        # Check if template is used by campaigns
+        campaign_count = db.query(Campaign).filter(Campaign.template_id == template_id).count()
+        if campaign_count > 0:
+            # Delete associated campaigns and their emails first
+            for campaign in db.query(Campaign).filter(Campaign.template_id == template_id).all():
+                for email in campaign.emails:
+                    for fu in email.follow_ups:
+                        db.delete(fu)
+                    db.delete(email)
+                db.delete(campaign)
+        db.delete(template)
+        db.commit()
     return RedirectResponse(url="/templates", status_code=303)

@@ -28,7 +28,12 @@
                 <td>{{ item.sent }}</td>
                 <td>{{ item.open_rate }}%</td>
                 <td>{{ item.reply_rate }}%</td>
-                <td><a href="/templates/{{ item.template.id }}/edit" class="btn btn-sm btn-primary">Modifier</a></td>
+                <td>
+                    <a href="/templates/{{ item.template.id }}/edit" class="btn btn-sm btn-primary">Modifier</a>
+                    <form method="post" action="/templates/{{ item.template.id }}/delete" style="display: inline;" onsubmit="return confirm('Supprimer ce template et toutes ses campagnes ?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

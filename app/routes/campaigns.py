@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Template, Campaign, CampaignEmail
+from app.models import Template, Campaign, CampaignEmail, FollowUp
 from app.templating import templates
 from app.services.google_sheets import fetch_prospects
 from app.services.variable_injection import render_template as render_vars, text_to_html
@@ -222,3 +222,42 @@ def campaign_detail(campaign_id: int, request: Request, db: Session = Depends(ge
         "opened": opened,
         "replied": replied,
     })
+
+
+@router.get("/{campaign_id}/edit")
+def campaign_edit(campaign_id: int, request: Request, db: Session = Depends(get_db)):
+    campaign = db.get(Campaign, campaign_id)
+    all_templates = db.query(Template).order_by(Template.created_at.desc()).all()
+    return templates.TemplateResponse(request, "campaigns/edit.html", {
+        "campaign": campaign,
+        "all_templates": all_templates,
+    })
+
+
+@router.post("/{campaign_id}/edit")
+def campaign_edit_post(
+    campaign_id: int,
+    name: str = Form(...),
+    template_id: int = Form(...),
+    status: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    campaign = db.get(Campaign, campaign_id)
+    campaign.name = name
+    campaign.template_id = template_id
+    campaign.status = status
+    db.commit()
+    return RedirectResponse(url=f"/campaigns/{campaign_id}", status_code=303)
+
+
+@router.post("/{campaign_id}/delete")
+def campaign_delete(campaign_id: int, db: Session = Depends(get_db)):
+    campaign = db.get(Campaign, campaign_id)
+    if campaign:
+        for email in campaign.emails:
+            for fu in email.follow_ups:
+                db.delete(fu)
+            db.delete(email)
+        db.delete(campaign)
+        db.commit()
+    return RedirectResponse(url="/", status_code=303)

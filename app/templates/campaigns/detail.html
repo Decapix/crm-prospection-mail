@@ -75,5 +75,11 @@
     </table>
 </div>
 
-<a href="/" class="btn">← Retour aux campagnes</a>
+<div class="flex gap-1">
+    <a href="/" class="btn">← Retour aux campagnes</a>
+    <a href="/campaigns/{{ campaign.id }}/edit" class="btn btn-primary">Modifier</a>
+    <form method="post" action="/campaigns/{{ campaign.id }}/delete" style="display: inline;" onsubmit="return confirm('Supprimer cette campagne et tous ses emails ?')">
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+    </form>
+</div>
 {% endblock %}
