@@ -15,8 +15,9 @@
             <small style="color: var(--text-light)">Variables disponibles : {% raw %}{{nom}}, {{prenom}}, {{nom_du_fondateur_decisionnaire}}, {{email_du_decisionnaire}}, {{telephone}}, {{site_web}}, {{adresse}}{% endraw %}</small>
         </div>
         <div class="form-group">
-            <label>Corps du message (HTML)</label>
+            <label>Corps du message</label>
             <textarea name="body_template" required>{{ template.body_template }}</textarea>
+            <small style="color: var(--text-light)">Écrivez en texte simple. Les retours à la ligne sont conservés automatiquement.</small>
         </div>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         <a href="/templates" class="btn">Annuler</a>

@@ -24,3 +24,13 @@ def render_template(template: str, data: dict) -> str:
         return match.group(0)
 
     return re.sub(r"\{\{(\s*\w+\s*)\}\}", replace_match, template)
+
+
+def text_to_html(text: str) -> str:
+    """Convert plain text with line breaks to HTML paragraphs."""
+    paragraphs = text.strip().split("\n\n")
+    html_parts = []
+    for p in paragraphs:
+        lines = p.strip().split("\n")
+        html_parts.append("<p>" + "<br>\n".join(lines) + "</p>")
+    return "\n".join(html_parts)

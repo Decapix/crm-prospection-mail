@@ -10,7 +10,7 @@ from app.database import get_db
 from app.models import Template, Campaign, CampaignEmail
 from app.templating import templates
 from app.services.google_sheets import fetch_prospects
-from app.services.variable_injection import render_template as render_vars
+from app.services.variable_injection import render_template as render_vars, text_to_html
 from app.services.scheduler import generate_send_times, schedule_campaign
 
 router = APIRouter(prefix="/campaigns")
@@ -99,7 +99,7 @@ def wizard_step3(request: Request, db: Session = Depends(get_db)):
             "nom": recipient.get("nom", ""),
             "prenom": recipient.get("prenom", ""),
             "subject": render_vars(template.subject_template, recipient),
-            "body": render_vars(template.body_template, recipient),
+            "body": text_to_html(render_vars(template.body_template, recipient)),
         })
 
     return templates.TemplateResponse(request, "campaigns/wizard_step3.html", {
@@ -183,7 +183,7 @@ def wizard_confirm(request: Request, db: Session = Depends(get_db)):
             recipient_email=recipient["email_du_decisionnaire"],
             recipient_data=recipient,
             rendered_subject=render_vars(template.subject_template, recipient),
-            rendered_body=render_vars(template.body_template, recipient),
+            rendered_body=text_to_html(render_vars(template.body_template, recipient)),
             scheduled_at=scheduled_at,
             send_status="pending",
             tracking_id=str(uuid.uuid4()),

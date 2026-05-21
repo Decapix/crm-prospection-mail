@@ -15,8 +15,14 @@
             <small style="color: var(--text-light)">Variables disponibles : {% raw %}{{nom}}, {{prenom}}, {{nom_du_fondateur_decisionnaire}}, {{email_du_decisionnaire}}, {{telephone}}, {{site_web}}, {{adresse}}{% endraw %}</small>
         </div>
         <div class="form-group">
-            <label>Corps du message (HTML)</label>
-            <textarea name="body_template" required placeholder="<p>Bonjour {% raw %}{{prenom}}{% endraw %},</p>"></textarea>
+            <label>Corps du message</label>
+            <textarea name="body_template" required placeholder="Bonjour {{prenom}},
+
+Je me permets de vous contacter...
+
+Cordialement,
+Votre nom"></textarea>
+            <small style="color: var(--text-light)">Écrivez en texte simple. Les retours à la ligne sont conservés automatiquement.</small>
         </div>
         <button type="submit" class="btn btn-primary">Créer</button>
     </form>
