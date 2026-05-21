@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Templates — CRM{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-2">
+    <h1>Templates</h1>
+    <a href="/templates/create" class="btn btn-primary">Nouveau Template</a>
+</div>
+
+{% if template_stats %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Campagnes</th>
+                <th>Envoyés</th>
+                <th>Taux d'ouverture</th>
+                <th>Taux de réponse</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in template_stats %}
+            <tr>
+                <td>{{ item.template.name }}</td>
+                <td>{{ item.campaign_count }}</td>
+                <td>{{ item.sent }}</td>
+                <td>{{ item.open_rate }}%</td>
+                <td>{{ item.reply_rate }}%</td>
+                <td><a href="/templates/{{ item.template.id }}/edit" class="btn btn-sm btn-primary">Modifier</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>Aucun template. <a href="/templates/create">Créer votre premier template</a></p>
+</div>
+{% endif %}
+{% endblock %}

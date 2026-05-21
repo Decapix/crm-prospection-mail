@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Nouveau Template — CRM{% endblock %}
+
+{% block content %}
+<h1>Nouveau Template</h1>
+<div class="card">
+    <form method="post" action="/templates/create">
+        <div class="form-group">
+            <label>Nom du template</label>
+            <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+            <label>Objet (sujet de l'email)</label>
+            <input type="text" name="subject_template" required placeholder="Bonjour {{prenom}}">
+            <small style="color: var(--text-light)">Variables disponibles : {{nom}}, {{prenom}}, {{nom_du_fondateur_decisionnaire}}, {{email_du_decisionnaire}}, {{telephone}}, {{site_web}}, {{adresse}}</small>
+        </div>
+        <div class="form-group">
+            <label>Corps du message (HTML)</label>
+            <textarea name="body_template" required placeholder="<p>Bonjour {{prenom}},</p>"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </form>
+</div>
+{% endblock %}
