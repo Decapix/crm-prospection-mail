@@ -8,6 +8,8 @@ services:
       - ./credentials:/app/credentials
     env_file:
       - .env
+    environment:
+      - TZ=Europe/Paris
     restart: unless-stopped
   caddy:
     image: caddy:2
