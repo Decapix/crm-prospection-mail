@@ -127,10 +127,14 @@ def wizard_step4(request: Request):
 @router.post("/new/step4")
 def wizard_step4_post(
     request: Request,
-    send_start: str = Form(...),
-    send_end: str = Form(...),
+    send_start_date: str = Form(...),
+    send_start_time: str = Form("09:00"),
+    send_end_date: str = Form(...),
+    send_end_time: str = Form("18:00"),
 ):
     wizard = request.session.get("wizard", {})
+    send_start = f"{send_start_date}T{send_start_time}"
+    send_end = f"{send_end_date}T{send_end_time}"
     wizard["send_start"] = send_start
     wizard["send_end"] = send_end
     request.session["wizard"] = wizard
