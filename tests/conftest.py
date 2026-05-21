@@ -40,19 +40,17 @@ def db_session():
     engine.dispose()
 
 
+client = TestClient(app)
+
+
 @pytest.fixture(autouse=True)
-def reset_db():
-    """Create tables before each test, drop after."""
+def reset_db_and_authenticate():
+    """Create tables and authenticate before each test, drop tables after."""
     Base.metadata.create_all(bind=engine_test)
+    from app.config import settings
+    client.post("/login", data={
+        "username": settings.auth_username,
+        "password": settings.auth_password,
+    })
     yield
     Base.metadata.drop_all(bind=engine_test)
-
-
-from app.config import settings
-
-client = TestClient(app, headers={
-    "Authorization": "Basic "
-    + __import__("base64").b64encode(
-        f"{settings.auth_username}:{settings.auth_password}".encode()
-    ).decode()
-})

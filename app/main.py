@@ -6,41 +6,27 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.responses import RedirectResponse
 
 from app.database import Base, engine, SessionLocal
 from app.config import settings
 from app.services.scheduler import init_scheduler, shutdown_scheduler, reload_pending_jobs
 
 
-class BasicAuthMiddleware(BaseHTTPMiddleware):
-    """HTTP Basic Auth — skips /penda/ (tracking pixel) and /static/."""
+class SessionAuthMiddleware(BaseHTTPMiddleware):
+    """Session-based auth — redirects to /login if not authenticated."""
+
+    OPEN_PATHS = ("/login", "/penda/", "/static/")
 
     async def dispatch(self, request, call_next):
         path = request.url.path
-        if path.startswith("/penda/") or path.startswith("/static/"):
+        if any(path.startswith(p) for p in self.OPEN_PATHS):
             return await call_next(request)
 
-        auth = request.headers.get("authorization")
-        if auth:
-            import base64
-            try:
-                scheme, credentials = auth.split(" ", 1)
-                if scheme.lower() == "basic":
-                    decoded = base64.b64decode(credentials).decode("utf-8")
-                    username, password = decoded.split(":", 1)
-                    if (
-                        secrets.compare_digest(username, settings.auth_username)
-                        and secrets.compare_digest(password, settings.auth_password)
-                    ):
-                        return await call_next(request)
-            except Exception:
-                pass
+        if request.session.get("authenticated"):
+            return await call_next(request)
 
-        return Response(
-            status_code=401,
-            headers={"WWW-Authenticate": 'Basic realm="CRM Prospection"'},
-        )
+        return RedirectResponse(url="/login", status_code=303)
 
 
 @asynccontextmanager
@@ -64,8 +50,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(SessionAuthMiddleware)
 app.add_middleware(SessionMiddleware, secret_key="crm-session-secret-key")
-app.add_middleware(BasicAuthMiddleware)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -76,6 +62,7 @@ from app.routes.templates_routes import router as templates_router
 from app.routes.replies import router as replies_router
 from app.routes.admin import router as admin_router
 from app.routes.penda import router as penda_router
+from app.routes.auth import router as auth_router
 
 app.include_router(dashboard_router)
 app.include_router(campaigns_router)
@@ -83,3 +70,4 @@ app.include_router(templates_router)
 app.include_router(replies_router)
 app.include_router(admin_router)
 app.include_router(penda_router)
+app.include_router(auth_router)
