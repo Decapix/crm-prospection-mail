@@ -168,7 +168,9 @@ def check_replies_job() -> None:
 def init_scheduler() -> BackgroundScheduler:
     """Initialize and start the APScheduler."""
     global scheduler
-    job_store = SQLAlchemyJobStore(url=settings.database_url)
+    # Use a separate SQLite file to avoid "database is locked" conflicts
+    jobs_db_url = settings.database_url.replace("crm.db", "scheduler_jobs.db")
+    job_store = SQLAlchemyJobStore(url=jobs_db_url)
     scheduler = BackgroundScheduler(jobstores={"default": job_store})
     scheduler.start()
     scheduler.add_job(
