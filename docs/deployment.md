@@ -142,13 +142,63 @@ Update `.env`:
 SERVER_URL=https://crm.yourdomain.com
 ```
 
-## 8. Updating
+## 8. Updating from your local machine with rsync
+
+No need to SSH into the VM manually. From your local project directory:
 
 ```bash
-cd crm
-git pull
-docker compose up -d --build
+# Sync code to VM (excludes credentials, data, env, and venv)
+rsync -avz --delete \
+  --exclude '.env' \
+  --exclude 'credentials/' \
+  --exclude 'data/' \
+  --exclude '*.db' \
+  --exclude '__pycache__/' \
+  --exclude '.pytest_cache/' \
+  --exclude 'venv/' \
+  --exclude '.git/' \
+  ./ user@YOUR_VM_IP:~/crm/
+
+# Then rebuild and restart remotely
+ssh user@YOUR_VM_IP "cd ~/crm && docker compose up -d --build"
 ```
+
+### One-liner deploy script
+
+Create a `deploy.sh` at the project root:
+
+```bash
+#!/bin/bash
+VM_USER=your-user
+VM_IP=your-vm-ip
+VM_PATH=~/crm
+
+echo "==> Syncing files..."
+rsync -avz --delete \
+  --exclude '.env' \
+  --exclude 'credentials/' \
+  --exclude 'data/' \
+  --exclude '*.db' \
+  --exclude '__pycache__/' \
+  --exclude '.pytest_cache/' \
+  --exclude 'venv/' \
+  --exclude '.git/' \
+  ./ ${VM_USER}@${VM_IP}:${VM_PATH}/
+
+echo "==> Rebuilding and restarting..."
+ssh ${VM_USER}@${VM_IP} "cd ${VM_PATH} && docker compose up -d --build"
+
+echo "==> Done!"
+```
+
+Make it executable and run:
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+**Important:** `.env`, `credentials/`, and `data/` are excluded so you never overwrite the VM's config or database. These files only exist on the VM.
 
 Data is persisted in the `crm_data` Docker volume — it survives rebuilds.
 
